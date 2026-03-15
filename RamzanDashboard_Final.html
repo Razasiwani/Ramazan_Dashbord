@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ramazan-26 Reporting Dashboard - MTM Boys</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* ================= PREMIUM BASE STYLES ================= */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0fdf4; 
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'); 
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 100% Reliable Sticky Header */
+        .super-sticky-header {
+            position: -webkit-sticky !important; 
+            position: sticky !important;         
+            top: 0 !important;
+            z-index: 100 !important;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        .islamic-title { font-family: 'Amiri', serif; }
+        
+        .header-bg {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+            border-bottom: 4px solid #d97706; 
+        }
+        
+        /* ================= BUTTONS ================= */
+        .btn-green { background: linear-gradient(to right, #166534, #15803d); color: white; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: none; cursor: pointer; }
+        .btn-green:hover { background: linear-gradient(to right, #14532d, #166534); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(22, 101, 52, 0.3); }
+        .btn-gold { background: linear-gradient(to right, #d97706, #f59e0b); color: white; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: none; cursor: pointer; }
+        .btn-gold:hover { background: linear-gradient(to right, #b45309, #d97706); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.3); }
+        .btn-red { background: linear-gradient(to right, #b91c1c, #dc2626); color: white; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: none; cursor: pointer; }
+        .btn-red:hover { background: linear-gradient(to right, #991b1b, #b91c1c); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(185, 28, 28, 0.3); }
+
+        /* ================= SCROLLBAR ================= */
+        .card-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .card-scroll::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; transition: background 0.3s; }
+        .card-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* ================= SECTION HEADERS ================= */
+        .section-header-modern {
+            background: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border-left: 6px solid #d97706; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* ================= CRISP TABLE UI ================= */
+        .table-modern { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background-color: white;
+        }
+        .table-modern th, .table-modern td { 
+            border: 1px solid #e2e8f0; 
+            padding: 10px 12px;
+        }
+        .table-modern th { 
+            background-color: #ecfdf5; 
+            color: #065f46; 
+            font-size: 12px; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 3px solid #34d399; 
+            position: sticky; top: 0; z-index: 10;
+        }
+        .table-modern td { 
+            color: #334155;
+            font-size: 13px;
+        }
+        .table-modern tbody tr { transition: background-color 0.2s ease; }
+        .table-modern tbody tr:nth-child(even) { background-color: #f8fafc; } 
+        .table-modern tbody tr:hover td { background-color: #dcfce7 !important; color: #064e3b; }
+
+        /* ================= CARDS ================= */
+        .capture-container { transition: box-shadow 0.4s ease, transform 0.4s ease; border: 1px solid #e2e8f0; background: white; }
+        .capture-container:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+
+        /* ================= SAFE EXPORT MODE (AUTO-SCALING & WRAP) ================= */
+        .exporting-mode { 
+            width: 1100px !important; 
+            max-width: none !important; 
+            min-width: 1100px !important; 
+            margin: 0 auto !important; 
+            overflow: visible !important; 
+        }
+        .exporting-mode .boost-text { font-size: 1.25rem !important; }
+        .exporting-mode .table-modern th { font-size: 1.3rem !important; padding: 14px 16px !important; }
+        .exporting-mode .table-modern td { padding: 12px 16px !important; font-size: 1.2rem !important; }
+        .exporting-mode .boost-title { font-size: 2.1rem !important; }
+        .exporting-mode .boost-date { font-size: 1.15rem !important; padding: 10px 18px !important; }
+        .exporting-mode .boost-badge { font-size: 1.05rem !important; padding: 8px 14px !important; }
+
+        /* THE ULTIMATE BOX FIX */
+        .exporting-mode .summary-box { 
+            padding: 20px 25px !important; 
+            border-radius: 12px !important; 
+            background: rgba(0, 0, 0, 0.2) !important; 
+            box-shadow: none !important; 
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            display: flex !important;
+            align-items: center !important;
+            margin-bottom: 5px !important;
+        }
+        .exporting-mode .summary-text { 
+            font-size: 1.1rem !important; 
+            padding-bottom: 5px !important; 
+            margin: 0 !important;
+            line-height: 1 !important;
+            display: block !important; 
+        }
+        .exporting-mode .summary-val { 
+            font-size: 2.6rem !important; 
+            line-height: 1 !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            display: block !important; 
+        }
+        .exporting-mode .comp-title-val {
+            font-size: 2.1rem !important; 
+            line-height: 1 !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            display: block !important; 
+        }
+    </style>
+</head>
+<body class="text-gray-800 relative">
+
+    <div id="exportLoader" class="hidden fixed inset-0 bg-white/90 z-[999] flex flex-col items-center justify-center backdrop-blur-sm">
+        <i class="fas fa-circle-notch fa-spin text-6xl text-green-600 mb-4"></i>
+        <h2 class="text-2xl font-bold text-green-900 islamic-title tracking-widest">Preparing Download...</h2>
+        <p class="text-sm text-gray-600 mt-2 font-medium">Please wait, your HD report is being generated.</p>
+    </div>
+
+    <div class="super-sticky-header" id="mainHeader">
+        <nav class="header-bg text-white p-3 relative w-full overflow-hidden">
+            <i class="fas fa-moon absolute -right-2 -top-2 text-8xl text-green-900 opacity-20 pointer-events-none"></i>
+            <div class="container mx-auto flex justify-between items-center relative z-10 w-full px-2 md:px-0">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="bg-white p-2 rounded-full shadow-xl border-2 border-yellow-400 flex items-center justify-center h-12 w-12 md:h-14 md:w-14 shrink-0">
+                        <i class="fas fa-mosque text-2xl text-green-700"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-2xl font-extrabold tracking-wider islamic-title text-yellow-400 drop-shadow-md m-0">
+                            MADRASATUL MADINA BOYS
+                        </h1>
+                        <p class="text-[10px] md:text-xs text-green-100 font-medium tracking-widest m-0 italic">Ramazan-26 Reporting Dashboard</p>
+                    </div>
+                </div>
+                <button onclick="toggleFilterPanel()" class="text-yellow-400 hover:text-white focus:outline-none p-2 rounded-lg border-2 border-yellow-500 hover:bg-green-700 transition-all duration-300" title="Show/Hide Filters">
+                    <i class="fas fa-sliders-h text-xl md:text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div id="filterPanel" class="bg-gray-50 p-3 md:p-4 border-b border-gray-200 shadow-inner transition-all duration-300">
+            <div class="container mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 items-end bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                    
+                    <div class="col-span-1 lg:col-span-3">
+                        <label for="fileUpload" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">1. Upload File</label>
+                        <div class="relative group">
+                            <input type="file" id="fileUpload" accept=".csv, .xlsx, .xls" class="w-full p-2 pl-8 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-400 bg-gray-50 outline-none cursor-pointer">
+                            <i class="fas fa-file-excel absolute left-3 top-2.5 text-green-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-3 flex gap-2">
+                        <div class="flex-1">
+                            <label for="filterStartDate" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">Start Date</label>
+                            <input type="date" id="filterStartDate" class="w-full p-2 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-400 bg-gray-50 outline-none">
+                        </div>
+                        <div class="flex-1">
+                            <label for="filterEndDate" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">End Date</label>
+                            <input type="date" id="filterEndDate" class="w-full p-2 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-green-400 bg-gray-50 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-2 relative">
+                        <label for="regionBtn" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">Region</label>
+                        <button id="regionBtn" onclick="toggleDropdown('regionCheckboxes')" class="w-full p-2 text-xs border border-gray-300 rounded bg-white text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-green-400">
+                            <span id="regionBtnText" class="truncate font-semibold text-gray-700">All Regions</span>
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </button>
+                        <div id="regionCheckboxes" class="dropdown-list hidden absolute z-50 w-full mt-1 max-h-48 overflow-y-auto card-scroll border border-gray-200 rounded bg-white shadow-xl text-xs text-left">
+                            <p class="text-gray-400 italic p-2 text-center">Upload file first...</p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-2 relative">
+                        <label for="stateBtn" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">State</label>
+                        <button id="stateBtn" onclick="toggleDropdown('stateCheckboxes')" class="w-full p-2 text-xs border border-gray-300 rounded bg-white text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-green-400">
+                            <span id="stateBtnText" class="truncate font-semibold text-gray-700">All States</span>
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </button>
+                        <div id="stateCheckboxes" class="dropdown-list hidden absolute z-50 w-full mt-1 max-h-48 overflow-y-auto card-scroll border border-gray-200 rounded bg-white shadow-xl text-xs text-left">
+                            <p class="text-gray-400 italic p-2 text-center">Upload file first...</p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-2 relative">
+                        <label for="areaBtn" class="block text-[10px] font-extrabold text-gray-500 uppercase mb-1 tracking-wider">Area</label>
+                        <button id="areaBtn" onclick="toggleDropdown('areaCheckboxes')" class="w-full p-2 text-xs border border-gray-300 rounded bg-white text-left flex justify-between items-center focus:outline-none focus:ring-1 focus:ring-green-400">
+                            <span id="areaBtnText" class="truncate font-semibold text-gray-700">All Areas</span>
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </button>
+                        <div id="areaCheckboxes" class="dropdown-list hidden absolute z-50 w-full mt-1 max-h-48 overflow-y-auto card-scroll border border-gray-200 rounded bg-white shadow-xl text-xs text-left">
+                            <p class="text-gray-400 italic p-2 text-center">Upload file first...</p>
+                        </div>
+                    </div>
+
+                    <div class="col-span-full flex gap-2 mt-1 pt-3 border-t border-gray-100">
+                        <button onclick="applyFilters()" class="flex-1 btn-green p-2 rounded shadow-sm font-bold text-[11px] uppercase tracking-wider"><i class="fas fa-check mr-1"></i> Apply Filter</button>
+                        <button onclick="resetFilters()" class="bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-black p-2 rounded shadow-sm font-bold text-[11px] transition-colors" title="Reset Filters"><i class="fas fa-sync-alt"></i> Reset</button>
+                        <button onclick="openExportModal('photo')" class="flex-1 btn-gold p-2 rounded shadow-sm font-bold text-[11px] uppercase tracking-wider">
+                            <i class="fas fa-camera mr-1"></i> Photo
+                        </button>
+                        <button onclick="openExportModal('pdf')" class="flex-1 btn-red p-2 rounded shadow-sm font-bold text-[11px] uppercase tracking-wider">
+                            <i class="fas fa-file-pdf mr-1"></i> PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border-b border-gray-200">
+            <div class="container mx-auto px-4 flex flex-wrap gap-2 py-2 justify-center md:justify-start">
+                <button onclick="switchView('dashboard')" id="tab-dashboard" class="px-5 py-1.5 rounded-full font-bold text-xs md:text-sm bg-green-700 text-white shadow-sm border border-green-800 transition-all duration-300">
+                    <i class="fas fa-chart-line mr-1 text-yellow-300"></i> Main Dashboard
+                </button>
+                <button onclick="switchView('mansab')" id="tab-mansab" class="px-5 py-1.5 rounded-full font-bold text-xs md:text-sm bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:text-green-800 transition-all duration-300">
+                    <i class="fas fa-id-badge mr-1 text-green-600"></i> Mansab Report
+                </button>
+                <button onclick="switchView('branch')" id="tab-branch" class="px-5 py-1.5 rounded-full font-bold text-xs md:text-sm bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:text-green-800 transition-all duration-300">
+                    <i class="fas fa-building mr-1 text-green-600"></i> Branch Report
+                </button>
+                <button onclick="switchView('comparison')" id="tab-comparison" class="px-5 py-1.5 rounded-full font-bold text-xs md:text-sm bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:text-green-800 transition-all duration-300">
+                    <i class="fas fa-balance-scale mr-1 text-blue-600"></i> Comparison
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="container mx-auto px-4 md:px-5 pb-16 mt-6">
+
+            <div id="view-dashboard" class="block w-full">
+                <div class="section-header-modern">
+                    <div class="bg-green-700 text-white p-2 rounded-lg shadow-sm"><i class="fas fa-sitemap text-lg"></i></div>
+                    <h2 class="text-base md:text-xl font-extrabold islamic-title tracking-wide text-green-900 uppercase m-0">Division Wise User Reports</h2>
+                </div>
+                <div id="divisionReportsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <div class="col-span-full text-center py-20 bg-white rounded-3xl shadow-sm border border-dashed border-gray-300">
+                        <div class="inline-block bg-green-50 p-5 rounded-full mb-4">
+                            <i class="fas fa-cloud-upload-alt text-5xl text-green-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">No Data Available</h3>
+                        <p class="text-gray-500 text-sm mt-2">Please upload your Excel file and apply filters.</p>
+                    </div>
+                </div>
+
+                <div id="bottomSummariesSection" class="hidden">
+                    <div class="section-header-modern">
+                        <div class="bg-yellow-500 text-green-950 p-2 rounded-lg shadow-sm"><i class="fas fa-star text-lg"></i></div>
+                        <h2 class="text-base md:text-xl font-extrabold islamic-title tracking-wide text-green-900 uppercase m-0">Overall Performance</h2>
+                    </div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <div id="top10Container" class="w-full flex justify-center h-full"></div>
+                        <div id="divisionSummaryContainer" class="w-full flex justify-center h-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-mansab" class="hidden w-full">
+                <div id="mansabSummaryContainer" class="mb-10 w-full flex justify-center"></div>
+                <div class="section-header-modern">
+                    <div class="bg-green-700 text-white p-2 rounded-lg shadow-sm"><i class="fas fa-id-card-alt text-lg"></i></div>
+                    <h2 class="text-base md:text-xl font-extrabold islamic-title tracking-wide text-green-900 uppercase m-0">Mansab Wise Reports</h2>
+                </div>
+                <div id="mansabReportContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="col-span-full text-center py-16 text-gray-400 italic">Upload data first to see Mansab Reports.</div>
+                </div>
+            </div>
+
+            <div id="view-branch" class="hidden w-full">
+                <div class="section-header-modern">
+                    <div class="bg-green-700 text-white p-2 rounded-lg shadow-sm"><i class="fas fa-mosque text-lg"></i></div>
+                    <h2 class="text-base md:text-xl font-extrabold islamic-title tracking-wide text-green-900 uppercase m-0">Branch Wise Reports</h2>
+                </div>
+                <div id="branchContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    <div class="col-span-full text-center py-16 text-gray-400 italic">Upload data first to see Branch Reports.</div>
+                </div>
+            </div>
+
+            <div id="view-comparison" class="hidden w-full">
+                <div class="section-header-modern border-l-blue-600">
+                    <div class="bg-blue-700 text-white p-2 rounded-lg shadow-sm"><i class="fas fa-balance-scale text-lg"></i></div>
+                    <h2 class="text-base md:text-xl font-extrabold islamic-title tracking-wide text-blue-900 uppercase m-0">Div Wise User Comparison Report</h2>
+                </div>
+                <div id="comparisonContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="col-span-full text-center py-16 text-gray-400 italic">Upload data with 2025 and 2026 columns to see comparison.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="bg-green-950 text-green-100 py-8 mt-10 border-t-4 border-yellow-500 shadow-inner w-full">
+            <div class="container mx-auto px-5 text-center flex flex-col items-center gap-2">
+                <div class="bg-white/10 p-2 rounded-full inline-block mb-1">
+                    <i class="fas fa-mosque text-2xl text-yellow-500/80"></i>
+                </div>
+                <p class="m-0 font-bold islamic-title tracking-wider text-base md:text-lg text-yellow-400">مدرسۃ المدینہ بوائز، دعوتِ اسلامی ہند</p>
+                <p class="m-0 text-xs text-green-300 tracking-wide font-medium">Ramazan-26 Reporting System</p>
+                <div class="h-px w-16 bg-green-800 my-1"></div>
+                <p class="m-0 text-[10px] text-green-600 font-mono tracking-widest">© 2026 - MTM DASHBOARD | ALL RIGHTS RESERVED</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="exportModal" class="hidden fixed inset-0 bg-gray-900/80 z-[200] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] border border-gray-200" id="exportModalContent">
+            <div class="bg-gradient-to-r from-green-800 to-green-700 p-4 text-white flex justify-between items-center" id="exportModalHeader">
+                <h3 id="exportModalTitle" class="font-bold text-base flex items-center tracking-wide"><i class="fas fa-download text-yellow-400 mr-2 text-lg"></i> Export Options</h3>
+                <button onclick="closeExportModal()" class="text-green-200 hover:text-white bg-green-900/50 hover:bg-green-900 p-1.5 rounded-full transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto card-scroll flex-grow bg-gray-50 space-y-2" id="modalListContainer">
+                </div>
+            <div class="p-4 bg-white border-t border-gray-100 text-center flex flex-col gap-2 items-center justify-center">
+                <button onclick="closeExportModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PDF Setup
+        window.addEventListener('load', function() {
+            if (window.jspdf && window.jspdf.jsPDF) { window.jsPDF = window.jspdf.jsPDF; }
+        });
+
+        let globalData = [];
+        let comparisonData = [];
+        
+        let exportableDivisionCards = []; 
+        let exportableMansabCards = [];   
+        let exportableBranchCards = [];
+        let exportableComparisonCards = [];
+        
+        let currentActiveView = 'dashboard';
+        let currentExportMode = 'photo'; 
+
+        const USER_TARGET = 225000; 
+
+        function getStr(val) { 
+            if (val === undefined || val === null) return ''; 
+            return String(val).trim(); 
+        }
+
+        function escapeHTML(str) { 
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); 
+        }
+
+        function getColStr(row, possibleNames) {
+            let keys = Object.keys(row);
+            let lowerNames = possibleNames.map(n => n.toLowerCase());
+            let match = keys.find(k => lowerNames.includes(k.trim().toLowerCase()));
+            return match ? (row[match] !== undefined && row[match] !== null ? String(row[match]).trim() : '') : '';
+        }
+
+        function extractAmount(row, possibleNames) {
+            let keys = Object.keys(row);
+            let match = keys.find(k => possibleNames.some(kw => String(k).toLowerCase().includes(kw)));
+            if (!match) return 0;
+            
+            let val = row[match];
+            if (val === undefined || val === null || val === '') return 0;
+            if (typeof val === 'number') return val;
+            
+            let cleanStr = String(val).replace(/,/g, '').replace(/[^\d.-]/g, '');
+            let parsed = parseFloat(cleanStr);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        function parseExcelDate(dateValue) {
+            if (!dateValue) return null;
+            if (!isNaN(dateValue) && typeof dateValue === 'number') {
+                return new Date(Math.round((dateValue - 25569) * 86400 * 1000));
+            }
+            let parsed = new Date(dateValue);
+            if (!isNaN(parsed.getTime())) return parsed;
+            let strVal = String(dateValue).trim();
+            let parts = strVal.split(/[-/]/);
+            if (parts.length === 3) {
+                let d = parseInt(parts[0], 10);
+                let m = parseInt(parts[1], 10) - 1;
+                let y = parseInt(parts[2], 10);
+                if (y < 100) y += 2000; 
+                let customDate = new Date(y, m, d);
+                if (!isNaN(customDate.getTime())) return customDate;
+            }
+            return null;
+        }
+
+        // --- Tabs ---
+        function switchView(viewName) {
+            currentActiveView = viewName;
+            ['view-dashboard', 'view-mansab', 'view-branch', 'view-comparison'].forEach(v => {
+                document.getElementById(v).classList.add('hidden');
+            });
+            let activeClass = "bg-green-700 text-white shadow-sm border-green-800";
+            let activeIconClass = "text-yellow-300";
+            let inactiveClass = "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-green-800";
+            let inactiveIconClass = "text-green-600";
+            
+            ['dashboard', 'mansab', 'branch', 'comparison'].forEach(v => {
+                let tab = document.getElementById('tab-' + v);
+                let icon = tab.querySelector('i');
+                if(v === viewName) {
+                    tab.className = `px-5 py-1.5 rounded-full font-bold text-xs md:text-sm border transition-all duration-300 ${activeClass}`;
+                    if(icon) icon.className = icon.className.replace(inactiveIconClass, activeIconClass);
+                    if(v === 'comparison') {
+                        tab.className = `px-5 py-1.5 rounded-full font-bold text-xs md:text-sm border transition-all duration-300 bg-blue-700 text-white shadow-sm border-blue-800`;
+                        if(icon) icon.className = icon.className.replace('text-green-600', 'text-yellow-300');
+                    }
+                } else {
+                    tab.className = `px-5 py-1.5 rounded-full font-bold text-xs md:text-sm border transition-all duration-300 ${inactiveClass}`;
+                    if(icon) icon.className = icon.className.replace(activeIconClass, inactiveIconClass);
+                }
+            });
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleFilterPanel() { document.getElementById('filterPanel').classList.toggle('hidden'); }
+        function toggleDropdown(id) { 
+            document.querySelectorAll('.dropdown-list').forEach(el => { if(el.id !== id) el.classList.add('hidden'); });
+            document.getElementById(id).classList.toggle('hidden'); 
+        }
+        document.addEventListener('click', function(event) {
+            ['regionCheckboxes', 'stateCheckboxes', 'areaCheckboxes'].forEach(id => {
+                const drop = document.getElementById(id);
+                const btn = drop?.previousElementSibling;
+                if (btn && drop && !btn.contains(event.target) && !drop.contains(event.target)) { drop.classList.add('hidden'); }
+            });
+        });
+
+        // --- Date Function ---
+        function getSelectedDateRange() {
+            let sd = document.getElementById('filterStartDate').value;
+            let ed = document.getElementById('filterEndDate').value;
+            const mths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            if (sd && ed) {
+                let d1 = new Date(sd); let d2 = new Date(ed);
+                return `${d1.getDate().toString().padStart(2, '0')}-${mths[d1.getMonth()]}-${d1.getFullYear().toString().slice(-2)} To ${d2.getDate().toString().padStart(2, '0')}-${mths[d2.getMonth()]}-${d2.getFullYear().toString().slice(-2)}`;
+            } else if (sd) {
+                let d1 = new Date(sd);
+                return `From ${d1.getDate().toString().padStart(2, '0')}-${mths[d1.getMonth()]}-${d1.getFullYear().toString().slice(-2)}`;
+            } else if (ed) {
+                let d2 = new Date(ed);
+                return `Up To ${d2.getDate().toString().padStart(2, '0')}-${mths[d2.getMonth()]}-${d2.getFullYear().toString().slice(-2)}`;
+            } else {
+                let today = new Date(); let yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+                let d = yesterday.getDate().toString().padStart(2, '0');
+                let m = mths[yesterday.getMonth()];
+                let y = yesterday.getFullYear().toString().slice(-2);
+                return `01-Jan-26 To ${d}-${m}-${y}`;
+            }
+        }
+
+        // --- File Upload ---
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    globalData = [];
+                    comparisonData = [];
+                    
+                    workbook.SheetNames.forEach(sheetName => {
+                        let sheetJson = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+                        if(sheetJson.length > 0) {
+                            let keys = Object.keys(sheetJson[0]).map(k => String(k).toLowerCase());
+                            if(keys.some(k => k.includes('2025') || k.includes('25') || k.includes('pending'))) {
+                                comparisonData = comparisonData.concat(sheetJson);
+                            } else {
+                                globalData = globalData.concat(sheetJson);
+                            }
+                        }
+                    });
+                    
+                    if(comparisonData.length === 0) comparisonData = globalData;
+                    if(globalData.length === 0) globalData = comparisonData;
+                    
+                    populateFilters();
+                    generateReports(globalData, comparisonData); 
+                    switchView('dashboard');
+                } catch(error) {
+                    alert("Error: File format is not supported.");
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function populateFilters() {
+            let regions = new Set();
+            globalData.forEach(row => { 
+                let r = getColStr(row, ['region', 'region name', 'zone']);
+                if (r !== '') regions.add(r); 
+            });
+            const regionContainer = document.getElementById('regionCheckboxes');
+            regionContainer.innerHTML = '';
+            Array.from(regions).sort().forEach(region => {
+                let safeVal = escapeHTML(region);
+                regionContainer.innerHTML += `<label class="flex items-center space-x-2 cursor-pointer mb-1 hover:bg-green-50 p-2 rounded-md text-gray-700 font-medium text-xs"><input type="checkbox" value="${safeVal}" class="region-cb form-checkbox h-4 w-4 text-green-600 rounded"><span class="truncate" title="${safeVal}">${safeVal}</span></label>`;
+            });
+            document.querySelectorAll('.region-cb').forEach(cb => { cb.addEventListener('change', () => {
+                let checkedCount = document.querySelectorAll('.region-cb:checked').length;
+                document.getElementById('regionBtnText').innerText = checkedCount > 0 ? `${checkedCount} Selected` : 'All Regions';
+                updateStateFilter(); 
+            });});
+            updateStateFilter(); 
+        }
+
+        function updateStateFilter() {
+            let selectedRegions = Array.from(document.querySelectorAll('.region-cb:checked')).map(cb => cb.value);
+            let states = new Set();
+            globalData.forEach(row => { 
+                let rowRegion = getColStr(row, ['region', 'region name', 'zone']); 
+                let rowState = getColStr(row, ['state', 'state name']);
+                if (rowState !== '' && (selectedRegions.length === 0 || selectedRegions.includes(rowRegion))) { states.add(rowState); }
+            });
+            const stateContainer = document.getElementById('stateCheckboxes');
+            stateContainer.innerHTML = '';
+            Array.from(states).sort().forEach(state => {
+                let safeVal = escapeHTML(state);
+                stateContainer.innerHTML += `<label class="flex items-center space-x-2 cursor-pointer mb-1 hover:bg-green-50 p-2 rounded-md text-gray-700 font-medium text-xs"><input type="checkbox" value="${safeVal}" class="state-cb form-checkbox h-4 w-4 text-green-600 rounded"><span class="truncate" title="${safeVal}">${safeVal}</span></label>`;
+            });
+            document.querySelectorAll('.state-cb').forEach(cb => { cb.addEventListener('change', () => {
+                let checkedCount = document.querySelectorAll('.state-cb:checked').length;
+                document.getElementById('stateBtnText').innerText = checkedCount > 0 ? `${checkedCount} Selected` : 'All States';
+                updateAreaFilter();
+            });});
+            document.getElementById('stateBtnText').innerText = 'All States'; 
+            updateAreaFilter();
+        }
+
+        function updateAreaFilter() {
+            let selectedRegions = Array.from(document.querySelectorAll('.region-cb:checked')).map(cb => cb.value);
+            let selectedStates = Array.from(document.querySelectorAll('.state-cb:checked')).map(cb => cb.value);
+            let areas = new Set();
+            globalData.forEach(row => { 
+                let rowRegion = getColStr(row, ['region', 'region name', 'zone']); 
+                let rowState = getColStr(row, ['state', 'state name']); 
+                let rowArea = getColStr(row, ['area', 'area name', 'district']);
+                if (rowArea !== '' && (selectedRegions.length === 0 || selectedRegions.includes(rowRegion)) && (selectedStates.length === 0 || selectedStates.includes(rowState))) { areas.add(rowArea); }
+            });
+            const areaContainer = document.getElementById('areaCheckboxes');
+            areaContainer.innerHTML = '';
+            Array.from(areas).sort().forEach(area => {
+                let safeVal = escapeHTML(area);
+                areaContainer.innerHTML += `<label class="flex items-center space-x-2 cursor-pointer mb-1 hover:bg-green-50 p-2 rounded-md text-gray-700 font-medium text-xs"><input type="checkbox" value="${safeVal}" class="area-cb form-checkbox h-4 w-4 text-green-600 rounded"><span class="truncate" title="${safeVal}">${safeVal}</span></label>`;
+            });
+            document.querySelectorAll('.area-cb').forEach(cb => { cb.addEventListener('change', () => {
+                let checkedCount = document.querySelectorAll('.area-cb:checked').length;
+                document.getElementById('areaBtnText').innerText = checkedCount > 0 ? `${checkedCount} Selected` : 'All Areas';
+            });});
+            document.getElementById('areaBtnText').innerText = 'All Areas'; 
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('.region-cb').forEach(cb => cb.checked = false);
+            document.getElementById('regionBtnText').innerText = 'All Regions';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            updateStateFilter(); 
+            generateReports(globalData, comparisonData); 
+        }
+
+        function applyFilters() {
+            let selectedRegions = Array.from(document.querySelectorAll('.region-cb:checked')).map(cb => cb.value);
+            let selectedStates = Array.from(document.querySelectorAll('.state-cb:checked')).map(cb => cb.value);
+            let selectedAreas = Array.from(document.querySelectorAll('.area-cb:checked')).map(cb => cb.value);
+            
+            let sd = document.getElementById('filterStartDate').value;
+            let ed = document.getElementById('filterEndDate').value;
+            let startDate = sd ? new Date(sd) : null; if(startDate) startDate.setHours(0,0,0,0);
+            let endDate = ed ? new Date(ed) : null; if(endDate) endDate.setHours(23,59,59,999);
+            
+            function filterData(dataArray) {
+                return dataArray.filter(row => {
+                    let match = true;
+                    let r = getColStr(row, ['region', 'region name', 'zone']); 
+                    let s = getColStr(row, ['state', 'state name']); 
+                    let a = getColStr(row, ['area', 'area name', 'district']);
+                    
+                    if (selectedRegions.length > 0 && !selectedRegions.includes(r)) match = false;
+                    if (selectedStates.length > 0 && !selectedStates.includes(s)) match = false;
+                    if (selectedAreas.length > 0 && !selectedAreas.includes(a)) match = false;
+                    
+                    if (match && (startDate || endDate)) {
+                        let dateKey = Object.keys(row).find(k => k.toLowerCase().includes('date'));
+                        if (dateKey && row[dateKey]) {
+                            let rowDate = parseExcelDate(row[dateKey]);
+                            if (rowDate) {
+                                if (startDate && rowDate < startDate) match = false;
+                                if (endDate && rowDate > endDate) match = false;
+                            }
+                        }
+                    }
+                    return match;
+                });
+            }
+            
+            if(window.innerWidth < 1024) { document.getElementById('filterPanel').classList.add('hidden'); }
+            generateReports(filterData(globalData), filterData(comparisonData));
+        }
+
+        // ================= REPORT ENGINE =================
+        function generateReports(data, compData) {
+            const divContainer = document.getElementById('divisionReportsContainer');
+            const mansabSummaryContainer = document.getElementById('mansabSummaryContainer');
+            const mansabContainer = document.getElementById('mansabReportContainer');
+            const bottomSummariesSection = document.getElementById('bottomSummariesSection');
+            const top10Container = document.getElementById('top10Container');
+            const divSummaryContainer = document.getElementById('divisionSummaryContainer');
+            const branchContainer = document.getElementById('branchContainer');
+            const compContainer = document.getElementById('comparisonContainer');
+            
+            exportableDivisionCards = []; exportableMansabCards = []; exportableBranchCards = []; exportableComparisonCards = [];
+            
+            let errHtml = `<div class="col-span-full text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-200"><div class="bg-red-50 p-4 rounded-full mb-3 inline-block"><i class="fas fa-exclamation-triangle text-4xl text-red-400"></i></div><h3 class="text-xl font-bold text-gray-800">No Records Found</h3><p class="text-sm text-gray-500">Please check your file or filters.</p></div>`;
+
+            let dateRangeText = getSelectedDateRange();
+            bottomSummariesSection.classList.remove('hidden');
+            
+            let filterText = "ALL AREAS";
+            let selectedRegions = Array.from(document.querySelectorAll('.region-cb:checked')).map(cb => cb.value);
+            let selectedStates = Array.from(document.querySelectorAll('.state-cb:checked')).map(cb => cb.value);
+            let selectedAreas = Array.from(document.querySelectorAll('.area-cb:checked')).map(cb => cb.value);
+            if(selectedAreas.length > 0) { filterText = selectedAreas.join(' | '); } 
+            else if (selectedStates.length > 0) { filterText = selectedStates.join(' | '); } 
+            else if (selectedRegions.length > 0) { filterText = selectedRegions.join(' | '); }
+
+            const calcAch = (amt) => ((amt / USER_TARGET) * 100).toFixed(1);
+
+            // ================= 1. MAIN DASHBOARD =================
+            if (data.length === 0) {
+                divContainer.innerHTML = errHtml; mansabSummaryContainer.innerHTML = ''; mansabContainer.innerHTML = errHtml; branchContainer.innerHTML = errHtml;
+                bottomSummariesSection.classList.add('hidden');
+            } else {
+                bottomSummariesSection.classList.remove('hidden');
+                divContainer.innerHTML = '';
+                let divisionsMap = {};
+                data.forEach(row => {
+                    let divName = getColStr(row, ['zone name', 'zone', 'division', 'division name']) || 'Unknown Division';
+                    let stateName = getColStr(row, ['state', 'state name']) || 'Unknown State';
+                    let areaName = getColStr(row, ['area', 'area name', 'district']) || 'Unknown Area';
+                    let userName = getColStr(row, ['user', 'user name', 'name']) || 'Unknown User';
+                    let mansabName = getColStr(row, ['designation', 'mansab']) || 'N/A';
+                    
+                    let amount = extractAmount(row, ['amount', 'collection']);
+                    let receiptNo = getColStr(row, ['receipt no', 'receipt', 'rsd', 'rsd no']) || 'N/A';
+
+                    if (!divisionsMap[divName]) divisionsMap[divName] = { state: stateName, totalAmt: 0, totalRcpt: 0, users: {} };
+                    if (!divisionsMap[divName].users[userName]) divisionsMap[divName].users[userName] = { area: areaName, mansab: mansabName, amountSum: 0, receipts: new Set(), rCount: 0 };
+                    
+                    divisionsMap[divName].users[userName].amountSum += amount;
+                    divisionsMap[divName].totalAmt += amount;
+                    
+                    if(receiptNo !== 'N/A' && receiptNo !== '') {
+                        divisionsMap[divName].users[userName].receipts.add(receiptNo);
+                        divisionsMap[divName].users[userName].rCount = divisionsMap[divName].users[userName].receipts.size;
+                    } else {
+                        divisionsMap[divName].users[userName].rCount += 1;
+                    }
+                    divisionsMap[divName].totalRcpt += 1;
+                });
+
+                Object.keys(divisionsMap).sort().forEach((divName, index) => {
+                    let divData = divisionsMap[divName]; let cardId = `card-div-${index}`;
+                    let sortedUsers = Object.keys(divData.users).map(u => ({ name: u, ...divData.users[u] })).sort((a,b) => b.amountSum - a.amountSum);
+
+                    let userRowsHtml = sortedUsers.map((user, idx) => {
+                        let achPct = parseFloat(calcAch(user.amountSum));
+                        let achColorClass = achPct >= 100 ? 'text-emerald-700' : 'text-amber-600';
+                        return `<tr><td class="boost-text text-gray-900 font-bold pl-3"><span class="text-gray-400 mr-1.5 font-medium">${idx+1}.</span>${user.name}</td><td class="boost-text text-gray-700 font-medium">${user.area}</td><td class="boost-text text-green-700 font-semibold">${user.mansab}</td><td class="text-center boost-text font-bold text-blue-600">${user.rCount}</td><td class="text-right boost-amount font-black text-green-700">₹${user.amountSum.toLocaleString('en-IN')}</td><td class="text-center boost-text font-extrabold ${achColorClass}">${achPct}%</td></tr>`;
+                    }).join('');
+
+                    let cardHtml = `
+                        <div id="${cardId}" class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col relative capture-container">
+                            <div class="bg-gradient-to-r from-green-900 to-green-700 p-5 text-white relative">
+                                <div class="boost-date absolute right-0 top-0 bg-yellow-400 text-yellow-950 font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-sm"><i class="fas fa-calendar-alt mr-1 text-yellow-800"></i> ${dateRangeText}</div>
+                                <div class="flex flex-wrap gap-2 mb-2 mt-1 items-center"><span class="text-[10px] font-bold uppercase tracking-widest text-yellow-300"><i class="fas fa-map-marker-alt mr-1"></i> ${divData.state}</span><span class="boost-badge text-[9px] font-bold tracking-wider text-white bg-black/20 px-2 py-0.5 rounded border border-white/20"><i class="fas fa-bullseye text-yellow-400 mr-1"></i> Per User Hadaf: ₹2,25,000</span></div>
+                                <h3 class="boost-title text-xl font-black leading-tight mb-4 pr-16 islamic-title text-white tracking-wide">${divName}</h3>
+                                <div class="summary-box flex justify-between items-center w-full">
+                                    <div><p class="summary-text text-[9px] uppercase text-green-100 tracking-wider font-bold opacity-80">Total Raseeden</p><p class="summary-val font-extrabold text-xl text-white m-0">${divData.totalRcpt}</p></div>
+                                    <div class="text-right"><p class="summary-text text-[9px] uppercase text-green-100 tracking-wider font-bold opacity-80">Div Total Amount</p><p class="summary-val font-black text-yellow-300 text-2xl m-0">₹${divData.totalAmt.toLocaleString('en-IN')}</p></div>
+                                </div>
+                            </div>
+                            <div class="p-0 flex-grow max-h-[350px] overflow-y-auto card-scroll bg-white">
+                                <table class="table-modern"><thead><tr><th class="pl-3">User Name</th><th>Area</th><th>Mansab</th><th>Rsd</th><th class="text-right">Amount</th><th class="text-center">% Ach</th></tr></thead><tbody>${userRowsHtml}</tbody></table>
+                            </div>
+                        </div>`;
+                    divContainer.insertAdjacentHTML('beforeend', cardHtml);
+                    exportableDivisionCards.push({ id: cardId, name: `Division: ${divName}` });
+                });
+
+                // --- A. TOP 10 USERS ---
+                let allUsersMap = {};
+                data.forEach(row => {
+                    let userName = getColStr(row, ['user', 'user name', 'name']) || 'Unknown User';
+                    let divName = getColStr(row, ['zone name', 'zone', 'division', 'division name']) || 'Unknown Division';
+                    let areaName = getColStr(row, ['area', 'area name', 'district']) || 'Unknown Area';
+                    let mansabName = getColStr(row, ['designation', 'mansab']) || 'N/A';
+                    let amount = extractAmount(row, ['amount', 'collection']);
+                    
+                    let key = userName + '|' + divName + '|' + areaName + '|' + mansabName;
+                    if(!allUsersMap[key]) { allUsersMap[key] = { user: userName, div: divName, area: areaName, mansab: mansabName, totalAmt: 0 }; }
+                    allUsersMap[key].totalAmt += amount;
+                });
+                let topUsersArr = Object.values(allUsersMap).sort((a,b) => b.totalAmt - a.totalAmt).slice(0, 10);
+                let top10RowsHtml = topUsersArr.map((item, idx) => `<tr><td class="text-center boost-text font-black text-yellow-600 w-10 text-base">${idx+1}</td><td class="boost-text font-semibold text-green-800">${item.div}</td><td class="boost-text font-bold text-gray-900">${item.user}</td><td class="boost-text font-medium text-gray-700">${item.area}</td><td class="boost-text font-semibold text-gray-700">${item.mansab}</td><td class="text-right boost-amount font-black text-green-700">₹${item.totalAmt.toLocaleString('en-IN')}</td></tr>`).join('');
+                
+                top10Container.innerHTML = `
+                    <div id="card-top10" class="w-full h-full bg-white rounded-2xl shadow-md border-2 border-yellow-500 overflow-hidden flex flex-col relative capture-container">
+                        <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 p-5 text-white relative border-b-4 border-yellow-700">
+                            <div class="boost-date absolute right-0 top-0 bg-green-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-sm"><i class="fas fa-calendar-alt mr-1"></i> ${dateRangeText}</div>
+                            <div class="mt-1 mb-2 flex flex-wrap gap-2 items-center"><p class="text-[10px] uppercase tracking-widest text-green-900 bg-yellow-300 inline-block px-2 py-0.5 rounded-md font-bold m-0 shadow-sm"><i class="fas fa-filter mr-1"></i> ${filterText}</p></div>
+                            <h3 class="boost-title text-2xl font-black leading-tight mb-1 text-white islamic-title">Top 10 Performers</h3><p class="text-xs text-yellow-100 font-medium m-0"><i class="fas fa-trophy mr-1 text-yellow-200"></i> Highest Ramazan Collection</p>
+                        </div>
+                        <div class="p-0 flex-grow max-h-[400px] overflow-y-auto card-scroll bg-white">
+                            <table class="table-modern"><thead><tr><th>Top</th><th>Division</th><th>User Name</th><th>Area</th><th>Mansab</th><th class="text-right">Amount</th></tr></thead><tbody>${top10RowsHtml}</tbody></table>
+                        </div>
+                    </div>`;
+                exportableDivisionCards.unshift({ id: 'card-top10', name: '★ Top 10 Performers' }); 
+
+                // --- B. OVERALL DIVISION SUMMARY ---
+                let divSummaryArr = Object.keys(divisionsMap).map(div => { return { divName: div, state: divisionsMap[div].state, totalRcpt: divisionsMap[div].totalRcpt, totalAmt: divisionsMap[div].totalAmt }; }).sort((a,b) => b.totalAmt - a.totalAmt);
+                let summaryRowsHtml = divSummaryArr.map((item, idx) => `<tr><td class="boost-text font-bold text-gray-800 pl-3"><span class="text-gray-400 mr-1 font-medium">${idx+1}.</span>${item.state}</td><td class="boost-text font-extrabold text-green-900">${item.divName}</td><td class="text-center boost-text font-bold text-blue-600">${item.totalRcpt}</td><td class="text-right boost-amount font-black text-green-700 pr-3">₹${item.totalAmt.toLocaleString('en-IN')}</td></tr>`).join('');
+                let totalOverallAmount = divSummaryArr.reduce((sum, item) => sum + item.totalAmt, 0); let totalOverallRcpt = divSummaryArr.reduce((sum, item) => sum + item.totalRcpt, 0);
+
+                divSummaryContainer.innerHTML = `
+                    <div id="card-summary-overall" class="w-full h-full bg-white rounded-2xl shadow-md border border-yellow-200 overflow-hidden flex flex-col relative capture-container">
+                        <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 p-5 text-white relative border-b-4 border-yellow-700">
+                            <div class="boost-date absolute right-0 top-0 bg-green-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-sm"><i class="fas fa-calendar-alt mr-1"></i> ${dateRangeText}</div>
+                            <div class="flex flex-wrap gap-2 mb-1 mt-1 items-center"><span class="text-[10px] font-bold uppercase tracking-widest text-yellow-100"><i class="fas fa-globe-asia mr-1"></i> ${filterText}</span></div>
+                            <h3 class="boost-title text-2xl font-black leading-tight mb-4 pr-16 text-white islamic-title">Division Wise Summary</h3>
+                            <div class="summary-box flex justify-between items-center w-full">
+                                <div><p class="summary-text text-[9px] uppercase text-yellow-100 tracking-wider font-bold opacity-90">Total Raseeden</p><p class="summary-val font-extrabold text-xl text-white m-0">${totalOverallRcpt}</p></div>
+                                <div class="text-right"><p class="summary-text text-[9px] uppercase text-yellow-100 tracking-wider font-bold opacity-90">Grand Total Amount</p><p class="summary-val font-black text-white text-2xl m-0">₹${totalOverallAmount.toLocaleString('en-IN')}</p></div>
+                            </div>
+                        </div>
+                        <div class="p-0 flex-grow max-h-[400px] overflow-y-auto card-scroll bg-white">
+                            <table class="table-modern"><thead><tr><th class="pl-3">State</th><th>Division Name</th><th>Raseeden</th><th class="text-right pr-3">Total Amount</th></tr></thead><tbody>${summaryRowsHtml}</tbody></table>
+                        </div>
+                    </div>`;
+                exportableDivisionCards.unshift({ id: 'card-summary-overall', name: '📊 Overall Division Summary' });
+
+                // ================= 2. TAB: MANSAB REPORTS =================
+                let stateMansabMap = {}; let mansabMap = {}; 
+                data.forEach(row => {
+                    let stateName = getColStr(row, ['state', 'state name']) || 'Unknown State';
+                    let desig = getColStr(row, ['designation', 'mansab']) || 'Unknown Mansab';
+                    let userName = getColStr(row, ['user', 'user name', 'name']) || 'Unknown User';
+                    let areaName = getColStr(row, ['area', 'area name', 'district']) || 'Unknown Area';
+                    let divName = getColStr(row, ['zone name', 'zone', 'division', 'division name']) || 'N/A';
+                    let amount = extractAmount(row, ['amount', 'collection']);
+                    let receiptNo = getColStr(row, ['receipt no', 'receipt', 'rsd', 'rsd no']) || 'N/A';
+
+                    if (!stateMansabMap[stateName]) stateMansabMap[stateName] = { totalAmt: 0, mansabs: {} };
+                    if (!stateMansabMap[stateName].mansabs[desig]) stateMansabMap[stateName].mansabs[desig] = { amountSum: 0, receipts: new Set(), rCount: 0 };
+                    stateMansabMap[stateName].mansabs[desig].amountSum += amount; stateMansabMap[stateName].totalAmt += amount;
+                    
+                    if (receiptNo !== 'N/A' && receiptNo !== '') { 
+                        stateMansabMap[stateName].mansabs[desig].receipts.add(receiptNo); 
+                        stateMansabMap[stateName].mansabs[desig].rCount = stateMansabMap[stateName].mansabs[desig].receipts.size; 
+                    } else { 
+                        stateMansabMap[stateName].mansabs[desig].rCount += 1; 
+                    }
+
+                    if (!mansabMap[desig]) mansabMap[desig] = { totalAmt: 0, totalRcpt: 0, users: {} };
+                    if (!mansabMap[desig].users[userName]) mansabMap[desig].users[userName] = { div: divName, area: areaName, amountSum: 0, receipts: new Set(), rCount: 0 };
+                    mansabMap[desig].users[userName].amountSum += amount; mansabMap[desig].totalAmt += amount;
+                    
+                    if(receiptNo !== 'N/A' && receiptNo !== '') { 
+                        mansabMap[desig].users[userName].receipts.add(receiptNo); 
+                        mansabMap[desig].users[userName].rCount = mansabMap[desig].users[userName].receipts.size; 
+                    } else { 
+                        mansabMap[desig].users[userName].rCount += 1; 
+                    }
+                    mansabMap[desig].totalRcpt += 1;
+                });
+
+                let stateMansabArr = Object.keys(stateMansabMap).map(state => { return { stateName: state, ...stateMansabMap[state] }; }).sort((a, b) => b.totalAmt - a.totalAmt);
+                let msbSummaryHtml = [];
+                stateMansabArr.forEach(sData => {
+                    let sortedMansabs = Object.keys(sData.mansabs).map(m => ({ name: m, ...sData.mansabs[m] })).sort((a, b) => b.amountSum - a.amountSum);
+                    msbSummaryHtml.push(`<tr class="bg-emerald-50 border-b border-emerald-200"><td colspan="3" class="py-2.5 px-4 text-sm boost-text font-black text-emerald-900 uppercase tracking-widest"><i class="fas fa-map-marker-alt mr-2 text-emerald-600"></i> ${sData.stateName} <span class="float-right text-emerald-800 font-bold bg-white px-2 py-1 rounded shadow-sm text-[11px]">Total: ₹${sData.totalAmt.toLocaleString('en-IN')}</span></td></tr>`);
+                    sortedMansabs.forEach(m => { msbSummaryHtml.push(`<tr><td class="boost-text text-gray-800 font-bold pl-10"><i class="fas fa-angle-right text-emerald-400 mr-2"></i> ${m.name}</td><td class="text-center boost-text font-bold text-blue-600">${m.rCount}</td><td class="text-right boost-amount font-black text-emerald-800 pr-4">₹${m.amountSum.toLocaleString('en-IN')}</td></tr>`); });
+                });
+
+                mansabSummaryContainer.innerHTML = `
+                    <div id="card-mansab-overall" class="w-full max-w-5xl bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col relative capture-container">
+                        <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 p-5 text-white relative">
+                            <div class="boost-date absolute right-0 top-0 bg-yellow-400 text-yellow-950 font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-md"><i class="fas fa-calendar-alt mr-1"></i> ${dateRangeText}</div>
+                            <div class="mt-1 mb-2 flex flex-wrap gap-2 items-center"><p class="text-[10px] text-emerald-900 bg-emerald-100 inline-block px-2 py-0.5 rounded font-bold m-0 uppercase tracking-widest"><i class="fas fa-filter mr-1"></i> ${filterText}</p></div>
+                            <h3 class="boost-title text-2xl font-black leading-tight mb-1 text-white islamic-title">Mansab Overall Summary</h3><p class="text-xs text-emerald-100 font-medium m-0"><i class="fas fa-id-card mr-1"></i> State-wise performance breakdown</p>
+                        </div>
+                        <div class="p-0 flex-grow max-h-[400px] overflow-y-auto card-scroll bg-white">
+                            <table class="table-modern w-full text-left"><thead class="sticky top-0 shadow-sm"><tr><th class="tracking-wide w-1/2 pl-4">State / Designation</th><th class="text-center tracking-wide">Raseeden</th><th class="text-right tracking-wide pr-4">Total Amount</th></tr></thead><tbody>${msbSummaryHtml.join('')}</tbody></table>
+                        </div>
+                    </div>`;
+                exportableMansabCards.push({ id: 'card-mansab-overall', name: '📊 Overall State-wise Mansab Summary' });
+
+                mansabContainer.innerHTML = '';
+                Object.keys(mansabMap).sort().forEach((mName, index) => {
+                    let mData = mansabMap[mName]; let cardId = `card-mansab-${index}`;
+                    let sortedUsers = Object.keys(mData.users).map(u => ({ name: u, ...mData.users[u] })).sort((a,b) => b.amountSum - a.amountSum);
+                    let userRowsHtml = sortedUsers.map((user, idx) => {
+                        let achPct = parseFloat(calcAch(user.amountSum)); let achColorClass = achPct >= 100 ? 'text-emerald-700' : 'text-amber-600';
+                        return `<tr><td class="boost-text text-gray-900 font-bold pl-3"><span class="text-gray-400 mr-1 font-medium">${idx+1}.</span>${user.name}</td><td class="boost-text text-gray-600 font-medium">${user.area}</td><td class="text-center boost-text font-bold text-blue-600">${user.rCount}</td><td class="text-right boost-amount font-bold text-emerald-800">₹${user.amountSum.toLocaleString('en-IN')}</td><td class="text-center boost-text font-extrabold ${achColorClass}">${achPct}%</td></tr>`;
+                    }).join('');
+
+                    let cardHtml = `
+                        <div id="${cardId}" class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col relative capture-container">
+                            <div class="bg-gradient-to-r from-emerald-900 to-emerald-700 p-5 text-white relative">
+                                <div class="boost-date absolute right-0 top-0 bg-yellow-400 text-yellow-950 font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-md"><i class="fas fa-calendar-alt mr-1"></i> ${dateRangeText}</div>
+                                <div class="flex flex-wrap gap-2 mb-2 mt-1 items-center"><span class="text-[10px] font-bold uppercase tracking-widest text-emerald-200"><i class="fas fa-filter mr-1"></i> ${filterText}</span><span class="boost-badge text-[9px] font-bold tracking-wider text-white bg-black/20 px-2 py-0.5 rounded border border-white/20"><i class="fas fa-bullseye text-yellow-400 mr-1"></i> Per User Hadaf: ₹2,25,000</span></div>
+                                <h3 class="boost-title text-xl font-black leading-tight mb-4 pr-24 islamic-title">${mName}</h3>
+                                <div class="summary-box flex justify-between items-center w-full">
+                                    <div><p class="summary-text text-[9px] uppercase text-emerald-100 tracking-wider font-bold opacity-90">Total Raseeden</p><p class="summary-val font-extrabold text-xl text-white m-0">${mData.totalRcpt}</p></div>
+                                    <div class="text-right"><p class="summary-text text-[9px] uppercase text-emerald-100 tracking-wider font-bold opacity-90">Total Amount</p><p class="summary-val font-black text-white text-2xl boost-title m-0">₹${mData.totalAmt.toLocaleString('en-IN')}</p></div>
+                                </div>
+                            </div>
+                            <div class="p-0 flex-grow max-h-[350px] overflow-y-auto card-scroll bg-white">
+                                <table class="table-modern"><thead><tr><th class="pl-3">Name</th><th>Area</th><th>Rsd</th><th class="text-right">Amount</th><th class="text-center">% Ach</th></tr></thead><tbody>${userRowsHtml}</tbody></table>
+                            </div>
+                        </div>`;
+                    mansabContainer.insertAdjacentHTML('beforeend', cardHtml);
+                    exportableMansabCards.push({ id: cardId, name: `Mansab: ${mName}` });
+                });
+
+                // ================= 3. TAB: BRANCH REPORTS =================
+                branchContainer.innerHTML = '';
+                let branchDivMap = {};
+                data.forEach(row => {
+                    let divName = getColStr(row, ['zone name', 'zone', 'division', 'division name']) || 'Unknown Division';
+                    let stateName = getColStr(row, ['state', 'state name']) || 'Unknown State';
+                    let areaName = getColStr(row, ['area', 'area name', 'district']) || 'Unknown Area';
+                    let branchName = getColStr(row, ['branch name', 'branch']) || 'Unknown Branch';
+                    let amount = extractAmount(row, ['amount', 'collection']);
+                    
+                    if (!branchName || branchName === '') branchName = 'N/A';
+                    if (!branchDivMap[divName]) branchDivMap[divName] = { state: stateName, totalAmt: 0, branches: {} };
+                    
+                    let bKey = branchName + '|' + areaName;
+                    if (!branchDivMap[divName].branches[bKey]) branchDivMap[divName].branches[bKey] = { name: branchName, area: areaName, amountSum: 0 };
+                    
+                    branchDivMap[divName].branches[bKey].amountSum += amount; 
+                    branchDivMap[divName].totalAmt += amount;
+                });
+
+                Object.keys(branchDivMap).sort().forEach((divName, index) => {
+                    let divData = branchDivMap[divName]; let cardId = `card-branch-${index}`;
+                    let sortedBranches = Object.values(divData.branches).sort((a,b) => b.amountSum - a.amountSum);
+                    let branchRowsHtml = sortedBranches.map((branch, idx) => `<tr><td class="text-center boost-text font-black text-gray-500 w-10">${idx+1}</td><td class="boost-text font-semibold text-gray-700 pl-2">${branch.area}</td><td class="boost-text font-bold text-gray-900">${branch.name}</td><td class="text-right boost-amount font-black text-green-700 pr-3">₹${branch.amountSum.toLocaleString('en-IN')}</td></tr>`).join('');
+
+                    let cardHtml = `
+                        <div id="${cardId}" class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col relative capture-container">
+                            <div class="bg-gradient-to-r from-green-800 to-green-600 p-5 text-white relative">
+                                <div class="boost-date absolute right-0 top-0 bg-yellow-400 text-yellow-950 font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-md"><i class="fas fa-calendar-alt mr-1"></i> ${dateRangeText}</div>
+                                <div class="flex flex-wrap gap-2 mb-1.5 mt-1 items-center"><span class="text-[10px] font-bold uppercase tracking-widest text-yellow-300"><i class="fas fa-map-marker-alt mr-1"></i> ${divData.state}</span></div>
+                                <h3 class="boost-title text-xl font-black leading-tight mb-2 text-white islamic-title">${divName}</h3><p class="text-xs text-green-100 mb-1 font-medium"><i class="fas fa-building mr-1"></i> Collection Details by Branch</p>
+                            </div>
+                            <div class="p-0 flex-grow max-h-[350px] overflow-y-auto card-scroll bg-white">
+                                <table class="table-modern"><thead><tr><th class="text-center">S.No</th><th class="pl-2">Area</th><th>Branch Name</th><th class="text-right pr-3">Amount</th></tr></thead><tbody>${branchRowsHtml}</tbody></table>
+                            </div>
+                            <div class="summary-box bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center w-full">
+                                <span class="summary-text text-xs text-gray-600 font-bold uppercase tracking-wide"><i class="fas fa-hashtag mr-1 text-gray-400"></i> Total Branches: ${sortedBranches.length}</span>
+                                <span class="summary-val text-lg text-green-800 font-black">Div Total: ₹${divData.totalAmt.toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>`;
+                    branchContainer.insertAdjacentHTML('beforeend', cardHtml);
+                    exportableBranchCards.push({ id: cardId, name: `Branch Report: ${divName}` });
+                });
+            }
+
+            // ================= 4. TAB: COMPARISON REPORTS (BEAUTIFIED & SORTED) =================
+            if (compData.length === 0) {
+                compContainer.innerHTML = errHtml;
+            } else {
+                compContainer.innerHTML = '';
+                let compDivisionsMap = {};
+                
+                compData.forEach(row => {
+                    let divName = getColStr(row, ['zone name', 'zone', 'division', 'division name']) || 'Unknown Division';
+                    let stateName = getColStr(row, ['state', 'state name']) || 'Unknown State';
+                    let areaName = getColStr(row, ['area', 'area name', 'district']) || 'Unknown Area';
+                    let userName = getColStr(row, ['user', 'user name', 'name']) || 'Unknown User';
+                    
+                    let r25 = extractAmount(row, ['2025', '25']);
+                    let r26 = extractAmount(row, ['2026', '26', 'amount', 'collection']);
+                    
+                    if (r25 === 0 && r26 === 0) return;
+                    
+                    if (!compDivisionsMap[divName]) {
+                        compDivisionsMap[divName] = { state: stateName, users: {} };
+                    }
+                    
+                    if (!compDivisionsMap[divName].users[userName]) {
+                        compDivisionsMap[divName].users[userName] = { area: areaName, r25: 0, r26: 0 };
+                    }
+                    
+                    compDivisionsMap[divName].users[userName].r25 += r25;
+                    compDivisionsMap[divName].users[userName].r26 += r26;
+                });
+
+                if (Object.keys(compDivisionsMap).length === 0) {
+                    compContainer.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400 italic bg-white rounded-2xl border border-gray-200">No comparison data found. Make sure columns contain '2025' and '2026'.</div>`;
+                }
+
+                Object.keys(compDivisionsMap).sort().forEach((divName, index) => {
+                    let divData = compDivisionsMap[divName]; 
+                    let cardId = `card-comp-${index}`;
+                    
+                    let usersArr = Object.keys(divData.users).map(u => {
+                        let uData = divData.users[u];
+                        let isNew = (uData.r25 === 0 && uData.r26 > 0);
+                        let pendingAmt = uData.r25 - uData.r26;
+                        let pendingPct = 0;
+                        let sortVal = 0;
+                        
+                        // NEW LOGIC FOR SORTING:
+                        // Top: Achieved (Highest surplus amount first) -> negative values
+                        // Middle: Pending (Lowest pending % first) -> positive values
+                        // Bottom: New Users (Highest collection first) -> high positive values
+                        if (isNew) {
+                            sortVal = 1000000 - uData.r26; // Goes to bottom
+                        } else if (uData.r26 >= uData.r25) {
+                            sortVal = -1000000 - (uData.r26 - uData.r25); // Goes to very top
+                        } else {
+                            pendingPct = (pendingAmt / uData.r25) * 100;
+                            sortVal = pendingPct; // Stays in middle
+                        }
+                        
+                        return { name: u, area: uData.area, r25: uData.r25, r26: uData.r26, isNew: isNew, pendingPct: pendingPct, sortVal: sortVal };
+                    });
+                    
+                    usersArr.sort((a,b) => a.sortVal - b.sortVal);
+                    
+                    let userRowsHtml = usersArr.map((u, idx) => {
+                        let nameHtml = u.name;
+                        
+                        let statusHtml = '';
+                        if (u.isNew) {
+                            statusHtml = `<span class="text-blue-600 font-black uppercase tracking-wide text-[11px] bg-blue-50 px-2 py-1 rounded shadow-sm border border-blue-200"><i class="fas fa-user-plus mr-1"></i> New User</span>`;
+                        } else if (u.r26 >= u.r25) {
+                            statusHtml = `<span class="text-emerald-600 font-black uppercase tracking-wide text-[11px] bg-emerald-50 px-2 py-1 rounded shadow-sm border border-emerald-200"><i class="fas fa-check-circle mr-1"></i> Achieved</span>`;
+                        } else {
+                            statusHtml = `<span class="text-red-600 font-extrabold bg-red-50 px-2 py-1 rounded shadow-sm border border-red-100">${u.pendingPct.toFixed(1)}%</span>`;
+                        }
+                        
+                        return `<tr>
+                            <td class="text-center font-bold text-gray-500 w-10">${idx+1}</td>
+                            <td class="boost-text text-gray-900 font-bold">${nameHtml}</td>
+                            <td class="boost-text text-gray-700 font-medium">${u.area}</td>
+                            <td class="text-right boost-amount font-bold text-gray-500">₹${u.r25.toLocaleString('en-IN')}</td>
+                            <td class="text-right boost-amount font-black text-blue-700">₹${u.r26.toLocaleString('en-IN')}</td>
+                            <td class="text-center boost-text">${statusHtml}</td>
+                        </tr>`;
+                    }).join('');
+
+                    // MODIFIED HEADER: TITLE MOVED TO CENTER, DIVISION & STATE AT TOP
+                    let cardHtml = `
+                        <div id="${cardId}" class="bg-white rounded-2xl shadow-md border-2 border-blue-500 overflow-hidden flex flex-col relative capture-container">
+                            <div class="bg-gradient-to-r from-blue-900 to-blue-700 p-5 text-white relative border-b-4 border-blue-800">
+                                <div class="boost-date absolute right-0 top-0 bg-yellow-400 text-yellow-950 font-bold text-[10px] px-3 py-1.5 rounded-bl-xl shadow-sm"><i class="fas fa-calendar-alt mr-1 text-yellow-800"></i> ${dateRangeText}</div>
+                                
+                                <div class="flex flex-wrap gap-2 mb-3 mt-1 items-center">
+                                    <span class="text-xs font-bold uppercase tracking-widest text-blue-200"><i class="fas fa-map-marker-alt mr-1"></i> ${divData.state} <span class="mx-1.5 text-blue-400">|</span> <i class="fas fa-map mr-1"></i> ${divName}</span>
+                                </div>
+                                
+                                <div class="summary-box flex justify-center items-center w-full bg-black/20 py-4 border border-blue-600/30">
+                                    <p class="comp-title-val font-black text-yellow-300 text-xl md:text-2xl m-0 uppercase tracking-widest text-center w-full"><i class="fas fa-users mr-2 text-blue-200"></i>User Wise Comparison Report</p>
+                                </div>
+                            </div>
+                            <div class="p-0 flex-grow max-h-[350px] overflow-y-auto card-scroll bg-white">
+                                <table class="table-modern"><thead><tr><th class="text-center">S.No</th><th>User Name</th><th>Area</th><th class="text-right">Rmz-25</th><th class="text-right">Rmz-26</th><th class="text-center">Pending / Status</th></tr></thead><tbody>${userRowsHtml}</tbody></table>
+                            </div>
+                        </div>`;
+                    compContainer.insertAdjacentHTML('beforeend', cardHtml);
+                    exportableComparisonCards.push({ id: cardId, name: `Comparison: ${divName}` });
+                });
+            }
+        }
+
+        // ==============================================================================================================
+        // --- 100% RELIABLE EXPORT LOGIC ---
+        // ==============================================================================================================
+        function openExportModal(mode) {
+            let cardsToExport = [];
+            if(currentActiveView === 'dashboard') cardsToExport = exportableDivisionCards;
+            else if(currentActiveView === 'mansab') cardsToExport = exportableMansabCards;
+            else if(currentActiveView === 'branch') cardsToExport = exportableBranchCards;
+            else if(currentActiveView === 'comparison') cardsToExport = exportableComparisonCards;
+            
+            if(cardsToExport.length === 0) { alert("Please upload a file and apply filters to view data first!"); return; }
+            
+            currentExportMode = mode;
+            const titleIcon = mode === 'pdf' ? '<i class="fas fa-file-pdf text-red-400 mr-2 text-xl"></i>' : '<i class="fas fa-camera text-yellow-400 mr-2 text-xl"></i>';
+            const titleText = mode === 'pdf' ? `Export PDF (${currentActiveView.toUpperCase()})` : `Export Photo (${currentActiveView.toUpperCase()})`;
+            document.getElementById('exportModalTitle').innerHTML = `${titleIcon} ${titleText}`;
+            
+            const btnClass = mode === 'pdf' ? 'btn-red' : 'btn-gold';
+            const btnIcon = mode === 'pdf' ? '<i class="fas fa-file-pdf mr-1"></i> PDF' : '<i class="fas fa-download mr-1"></i> Photo';
+
+            const listContainer = document.getElementById('modalListContainer');
+            listContainer.innerHTML = cardsToExport.map((card, index) => `
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-2 flex justify-between items-center hover:shadow-md transition">
+                    <span class="font-bold text-gray-700 text-xs truncate w-2/3"><i class="fas fa-file-alt text-green-500 mr-2"></i> ${card.name}</span>
+                    <button onclick="processExport(${index})" class="${btnClass} text-white px-4 py-1.5 rounded-lg text-[10px] font-extrabold flex items-center shadow-sm uppercase tracking-wider">
+                        ${btnIcon}
+                    </button>
+                </div>
+            `).join('');
+            
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() { document.getElementById('exportModal').classList.add('hidden'); }
+
+        function processExport(index) {
+            closeExportModal(); 
+            const loader = document.getElementById('exportLoader');
+            loader.classList.remove('hidden');
+            
+            setTimeout(() => {
+                let cardsToExport = [];
+                if(currentActiveView === 'dashboard') cardsToExport = exportableDivisionCards;
+                else if(currentActiveView === 'mansab') cardsToExport = exportableMansabCards;
+                else if(currentActiveView === 'branch') cardsToExport = exportableBranchCards;
+                else if(currentActiveView === 'comparison') cardsToExport = exportableComparisonCards;
+                
+                let card = cardsToExport[index];
+                const element = document.getElementById(card.id);
+                const scrollArea = element.querySelector('.card-scroll');
+                const topHeader = document.getElementById('mainHeader');
+                
+                // Hide sticky header to prevent white space at the top of the canvas
+                topHeader.style.display = 'none';
+
+                let origMaxHeight = '', origOverflow = '', origWidth = element.style.width;
+                
+                element.classList.remove('overflow-hidden');
+                element.classList.add('exporting-mode');
+
+                if(scrollArea) {
+                    origMaxHeight = scrollArea.style.maxHeight;
+                    origOverflow = scrollArea.style.overflowY;
+                    scrollArea.style.maxHeight = 'none'; 
+                    scrollArea.style.overflowY = 'visible';
+                }
+                
+                element.style.width = '1100px'; 
+                element.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+                setTimeout(() => {
+                    html2canvas(element, { 
+                        scale: 2, 
+                        useCORS: true,
+                        width: 1100,
+                        windowWidth: 1100,
+                        scrollY: -window.scrollY, 
+                        backgroundColor: "#ffffff",
+                        logging: false
+                    }).then(canvas => {
+                        let safeName = card.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                        
+                        if (currentExportMode === 'photo') {
+                            let link = document.createElement('a');
+                            link.download = `Photo_${safeName}.png`;
+                            link.href = canvas.toDataURL("image/png");
+                            link.click();
+                        } 
+                        else if (currentExportMode === 'pdf') {
+                            if (window.jsPDF) {
+                                const pdf = new window.jsPDF({
+                                    orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                                    unit: 'px',
+                                    format: [canvas.width, canvas.height]
+                                });
+                                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                                pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+                                pdf.save(`PDF_${safeName}.pdf`);
+                            } else {
+                                alert("PDF Engine Error.");
+                            }
+                        }
+                        
+                        // RESTORE STYLES
+                        topHeader.style.display = 'block'; 
+                        element.classList.add('overflow-hidden');
+                        element.classList.remove('exporting-mode');
+                        if(scrollArea) {
+                            scrollArea.style.maxHeight = origMaxHeight;
+                            scrollArea.style.overflowY = origOverflow;
+                        }
+                        element.style.width = origWidth;
+                        loader.classList.add('hidden');
+                        
+                    }).catch(err => {
+                        console.error("Canvas error:", err);
+                        alert("Error generating image.");
+                        topHeader.style.display = 'block';
+                        element.classList.add('overflow-hidden');
+                        element.classList.remove('exporting-mode');
+                        if(scrollArea) {
+                            scrollArea.style.maxHeight = origMaxHeight;
+                            scrollArea.style.overflowY = origOverflow;
+                        }
+                        element.style.width = origWidth;
+                        loader.classList.add('hidden');
+                    });
+                }, 500); 
+            }, 100);
+        }
+    </script>
+</body>
+</html>
